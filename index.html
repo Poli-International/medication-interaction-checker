@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+  <script>
+    if (window.self !== window.top) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'poli-theme') {
+          document.documentElement.setAttribute('data-theme', e.data.light ? 'light' : 'dark');
+        }
+      });
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Check how common medications affect piercing healing, tattoo healing, and bleeding risk. Educational reference covering blood thinners, retinoids, steroids, and immunosuppressants.">
+  <title>Medication Interaction Checker for Tattoos & Piercings | Poli International</title>
+  <link rel="stylesheet" href="/tools/medication-interaction-checker/css/style.css">
+</head>
+<body>
+<div class="tool-wrapper">
+
+  <header class="tool-header">
+    <div class="tool-header__badge">💊 Medication Reference</div>
+    <h1>Medication Interaction Checker</h1>
+    <p>Check how common medications affect healing, bleeding risk, and infection susceptibility for tattoos and piercings.</p>
+  </header>
+
+  <div class="info-note">
+    Select all medications you currently take. This tool covers the most common interactions — always disclose your full medication list to your artist or piercer.
+  </div>
+
+  <div id="med-list" class="med-list"></div>
+
+  <div id="result"></div>
+
+  <div class="disclaimer">
+    <strong>Important:</strong> This tool is an educational reference only and does not constitute medical advice.
+    Never stop or adjust prescribed medication without consulting your prescribing physician. Always inform your
+    tattoo artist and piercer of any medications you are taking before the procedure.
+  </div>
+
+</div>
+<script src="/tools/medication-interaction-checker/js/app.js"></script>
+</body>
+</html>
