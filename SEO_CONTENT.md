@@ -1,3 +1,10 @@
+> **PARTIALLY STALE (2026-08-26).** The keyword research below predates the
+> supplement checker, the seven-language interface and the local-language "find
+> nearby" links, so it does not cover those surfaces. The keywords it does list
+> are still accurate.
+
+---
+
 # Medication & Body Art Interaction Checker - Complete Guide
 
 ## Target Keywords

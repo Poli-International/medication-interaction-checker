@@ -1,3 +1,19 @@
+> **STALE - READ THIS FIRST (2026-08-26).**
+> This report was written against an earlier, much smaller version of the tool: a
+> single-panel checkbox list with one `app.js`. The current build has six tabs, a
+> supplement checker, seven interface languages and 684 hand-authored clinical
+> strings. **These tests have not been re-run against it.**
+>
+> One conclusion below is known to be wrong for the current build: it reports no
+> accessibility blockers, but the tab set carries no ARIA at all (no `role="tab"`,
+> no `aria-selected`, no `aria-controls`, no `role="tabpanel"`), so a screen reader
+> announces six unrelated buttons rather than a tab set. That is a known open item,
+> not a passing result.
+>
+> The document is kept for history. Do not cite it as current assurance.
+
+---
+
 # Medication & Body Art Interaction Checker - Testing Report
 
 ## Executive Summary

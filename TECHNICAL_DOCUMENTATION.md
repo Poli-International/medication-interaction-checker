@@ -1,329 +1,220 @@
 # Medication & Body Art Interaction Checker - Technical Documentation
 
-## Table of Contents
+**Also in:** [Français](docs/TECHNICAL_DOCUMENTATION_FR.md) · [Italiano](docs/TECHNICAL_DOCUMENTATION_IT.md) · [Español](docs/TECHNICAL_DOCUMENTATION_ES.md) · [Deutsch](docs/TECHNICAL_DOCUMENTATION_DE.md) · [Nederlands](docs/TECHNICAL_DOCUMENTATION_NL.md) · [Português](docs/TECHNICAL_DOCUMENTATION_PT.md)
 
-- [Architecture Overview](#architecture-overview)
-- [Data Schemas](#data-schemas)
-- [Calculation / Logic Algorithms](#calculation--logic-algorithms)
-- [API Reference](#api-reference)
-- [Integration Guide](#integration-guide)
-- [Customization](#customization)
-- [Performance](#performance)
-- [Browser Compatibility](#browser-compatibility)
-- [Security](#security)
-- [Version History](#version-history)
-- [Support / Contact](#support--contact)
+---
 
-## Architecture Overview
+## Table of contents
 
-### Technology Stack
+1. [Architecture](#architecture)
+2. [File layout](#file-layout)
+3. [Data schemas](#data-schemas)
+4. [The internationalization system](#the-internationalization-system)
+5. [Geo search: local-language Maps links](#geo-search-local-language-maps-links)
+6. [Evidence and sourcing](#evidence-and-sourcing)
+7. [State and storage](#state-and-storage)
+8. [Embedding](#embedding)
+9. [Customization](#customization)
+10. [Security](#security)
+11. [Browser support](#browser-support)
 
-- **HTML5**, Single-page tool interface with semantic markup
-- **CSS3**, External stylesheet at `/tools/medication-interaction-checker/css/style.css`
-- **JavaScript (ES6)**, Vanilla JS, no frameworks, no external dependencies
+---
 
-### File Structure
+## Architecture
+
+Static HTML, CSS and ES2015+ JavaScript. No framework, no bundler, no package manager, no runtime network calls except the Google Maps links the user clicks.
+
+Every data set is **snapshotted at build time into a JavaScript file**, deliberately. The tool never calls SUPP.AI, PubMed or any other API while a client is using it. That means it cannot break because a third party is down, it cannot leak what a user is looking up, and its behaviour is reproducible from the repository alone.
+
+Load order matters: the data files declare top-level `const`s that `app.js` reads, so `app.js` is last.
 
 ```
-medication-interaction-checker/
-├── index.html
-├── css/
-│   └── style.css
-└── js/
-    └── app.js
+index.html
+  -> css/style.css, css/a11y.css, css/print.css
+  -> js/med-content-i18n.js      (clinical text, 6 languages)
+  -> js/medication-sources.js    (approved citations)
+  -> js/supplement-stacking.js   (SUPP.AI snapshot)
+  -> js/geo-search.js            (Maps query terms + timezone map)
+  -> js/app.js                   (data, UI, rendering)
 ```
 
-### Component / Logic Breakdown
+Six tabs, switched client-side, no routing: `checker`, `supplements`, `brief`, `reminders`, `safety`, `faq`.
 
-| Component | File | Description |
-|-----------|------|-------------|
-| Tool wrapper | `index.html` | Outer container with header, badge, info note, medication list container, result container, and disclaimer |
-| Medication list | `app.js` | Dynamically built from `CATEGORIES` constant, renders grouped checkboxes with medication names and subtypes |
-| Result panel | `app.js` | Dynamically rendered interaction cards with severity badges, tattoo/piercing effects, and wait-time guidance |
-| Clear button | `app.js` | Injected into result panel, resets all checkboxes and clears results |
-| Theme listener | `index.html` | Embedded script that listens for `poli-theme` postMessage events for iframe embedding |
+## File layout
 
-## Data Schemas
+| Path | Size | Role |
+|---|---|---|
+| `index.html` | ~43 KB | Markup, JSON-LD, tab shell, iframe theme bridge |
+| `css/style.css` | ~60 KB | All component styling, light and dark via `:root` tokens |
+| `css/a11y.css` | ~1 KB | Focus-visible and screen-reader utilities |
+| `css/print.css` | ~2 KB | Print rules for the artist brief |
+| `js/app.js` | ~181 KB | `CATEGORIES` data, 65 functions, all rendering |
+| `js/med-content-i18n.js` | ~127 KB | 684 hand-authored clinical strings |
+| `js/supplement-stacking.js` | ~48 KB | 66 supplements, 49 pairs, 132 papers |
+| `js/geo-search.js` | ~14 KB | 38 query languages, 217 timezone mappings |
+| `js/medication-sources.js` | ~2 KB | Approved PubMed citations per medication |
 
-### `CATEGORIES` Array (Constant)
+## Data schemas
 
-Top-level array of category objects. Each category contains a label and an array of medication objects.
+### `CATEGORIES` (in `app.js`)
 
-```javascript
-CATEGORIES = [
+The single source of truth for medications. 13 categories, 38 medications.
+
+```js
+const CATEGORIES = [
   {
-    label: "Blood thinners / Anticoagulants",    // string, category heading
-    meds: [                                       // array of medication objects
+    id: 'pain',
+    label: 'Painkillers & Anti-inflammatories (NSAIDs)',
+    meds: [
       {
-        id: "warfarin",                           // string, unique identifier
-        name: "Warfarin",                         // string, display name
-        sub: "Coumadin",                          // string, subtype / brand name
-        sev: "high",                              // string, severity level: "high" | "mod" | "low"
-        tattoo: "Significant bleeding during...", // string, tattoo-specific interaction description
-        piercing: "Excessive bleeding during...", // string, piercing-specific interaction description
-        wait: "Discuss stopping or bridging..."   // string, wait time / guidance note
-      },
-      // ...more medications
+        id: 'ibuprofen',              // stable key, used by every other data file
+        name: 'Ibuprofen',
+        sub: 'Advil, Nurofen, Motrin',
+        cat: 'pain',
+        sev: 'mod',                    // 'high' | 'mod' | 'low'
+        riskBadges: ['Bleeding Risk', 'Plasma Oozing'],
+        tattoo: '...',                 // English source text
+        piercing: '...',
+        wait: '...',
+        tags: 'pain, nsaid, advil, ...' // search synonyms, incl. regional brands
+      }
     ]
-  },
-  // ...more categories
+  }
 ]
 ```
 
-### `medMap` Object (Lookup Map)
+`medMap` is a flat `id -> medication` lookup built from this at startup.
 
-Built dynamically from `CATEGORIES` for O(1) medication lookups by ID.
+Category ids: `pain`, `numbing`, `blood`, `retinoid`, `anxiety`, `hormone`, `stimulant`, `metabolic`, `corticosteroid`, `immuno`, `supplement`, `antibiotic`, `substance`.
 
-```javascript
-medMap = {
-  "warfarin": { /* full medication object */ },
-  "apixaban": { /* full medication object */ },
-  // ...all medication IDs as keys
-}
+**Severity is about procedure risk, not about how serious the drug is.** `high` means the interaction with a needle is significant. A vital medication can be `low`.
+
+### `MED_CONTENT_I18N` (in `med-content-i18n.js`)
+
+```js
+{ ibuprofen: { fr: { tattoo, piercing, wait }, it: {...}, es: {...},
+               de: {...}, nl: {...}, pt: {...} } }
 ```
 
-### Severity Levels
+38 medications x 3 fields x 6 languages = 684 strings. English lives in `CATEGORIES`, so it is not repeated here.
 
-| Value | Label | CSS Variable |
-|-------|-------|--------------|
-| `"high"` | High concern | `var(--sev-high)` |
-| `"mod"` | Moderate concern | `var(--sev-mod)` |
-| `"low"` | Low concern | `var(--sev-low)` |
+### `SUPPLEMENT_STACKING` (in `supplement-stacking.js`)
 
-## Calculation / Logic Algorithms
-
-### `renderResults()`, Main Display Function
-
-**Trigger:** Fires on every `change` event on the medication list container (`#med-list`).
-
-**Step-by-step logic:**
-
-1. **Collect checked medications**, Queries all `<input data-med-id>` elements that are `:checked`, extracts their `data-med-id` values into the `checked` array.
-
-2. **Early return**, If `checked.length === 0`, clears `resultEl.innerHTML` and exits.
-
-3. **Sort by severity**, Uses `sevOrder` lookup (`{ high: 0, mod: 1, low: 2 }`) to sort checked IDs so highest-concern medications appear first.
-
-4. **Count severity levels**, Counts how many checked medications have `sev === "high"` and `sev === "mod"`.
-
-5. **Determine summary color**, Sets `summaryColor` CSS variable:
-   - If any high-severity medication is selected → `var(--sev-high)`
-   - Else if any moderate-severity medication is selected → `var(--sev-mod)`
-   - Else → `var(--sev-low)`
-
-6. **Build interaction cards**, Maps each sorted ID to an HTML card containing:
-   - Medication name and subtype
-   - Severity badge (color-coded by severity level)
-   - Tattoo effect row
-   - Piercing effect row
-   - Wait note (if `m.wait` is truthy)
-
-7. **Render result panel**, Injects HTML into `resultEl` containing:
-   - Summary header with count and severity summary
-   - Clear all button
-   - All interaction cards
-
-8. **Attach clear handler**, Binds click event to `#clear-btn` that unchecks all checkboxes and clears results.
-
-### `escHtml(s)`, XSS Sanitization
-
-**Input:** Any string value  
-**Output:** HTML-escaped string safe for innerHTML injection
-
-Replaces: `&` → `&amp;`, `<` → `&lt;`, `>` → `&gt;`, `"` → `&quot;`
-
-Applied to all user-facing text rendered via template literals.
-
-### Severity Ordering Algorithm
-
-```javascript
-const sevOrder = { high: 0, mod: 1, low: 2 };
-const sorted = [...checked].sort((a, b) => sevOrder[medMap[a].sev] - sevOrder[medMap[b].sev]);
+```js
+[ { cui: 'C0016157', supplement: 'Fish Oil',
+    interactions: [ { drug: 'Aspirin',
+                      papers: [ { pmid, doi, title, year, clinical } ] } ] } ]
 ```
 
-Sorts medications from highest concern to lowest concern for display priority.
+Generated from SUPP.AI. Only pairs with at least one human or clinical study are included; retracted papers are excluded. `cui` is the UMLS concept id, which is what makes the mapping auditable.
 
-## API Reference
+### `MEDICATION_SOURCES` (in `medication-sources.js`)
 
-### Public Functions
+```js
+{ warfarin: [ { url, pmid, claim } ] }
+```
 
-#### `escHtml(s)`
+`claim` states what the paper is being cited *for*. An empty object renders as no sources line, never as a broken heading.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `s` | `string` | Raw string to sanitize |
+## The internationalization system
 
-**Returns:** `string`, HTML-escaped safe string.
+Two separate layers, and conflating them is the classic bug:
 
-**Behavior:** Replaces `&`, `<`, `>`, `"` with their HTML entity equivalents.
+1. **Interface strings** live in `TRANSLATIONS` in `app.js`, keyed by language then key, applied through `data-i18n` and `data-i18n-placeholder` attributes.
+2. **Clinical strings** live in `med-content-i18n.js` and are read through `medText(med, field)`.
 
----
+`medText()` returns English when a translation is missing and sets a `medTextFellBack` flag, which renders a visible notice. Silence is not an option: a reader seeing a French interface will assume the drug guidance is French-reviewed.
 
-#### `renderResults()`
+Every non-English view carries a permanent notice stating the page is translated and that the English version is the one we stand behind. That notice is not a "translation in progress" banner, it is permanent, because the guarantee never changes.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| (none) |, | Reads from DOM state |
+**The clinical text is hand-authored, not machine-translated.** The order it was built in is the reusable part: French first, high-severity medications only, because that was the only tranche a reviewer could actually check before it went live. Once reviewed, its vocabulary became fixed for the other five languages. The terminology decisions are recorded in the header of `med-content-i18n.js` and should be read before adding a language.
 
-**Returns:** `void`, Updates `resultEl.innerHTML` directly.
+## Geo search: local-language Maps links
 
-**Behavior:** Reads all checked medication checkboxes, sorts by severity, builds and renders interaction cards.
+`geo-search.js` powers four links: studio, doctor, pharmacy, hospital.
 
----
+**The button label is in the reader's UI language. The Maps query is in the language of where they physically are.** Those are deliberately different. A French reader in Bangkok searching `pharmacie` finds almost nothing; `ร้านขายยา` finds every chemist on the street.
 
-### Event Handlers
+Location is resolved from `Intl.DateTimeFormat().resolvedOptions().timeZone`, mapped through `GEO_SEARCH_ZONES` (217 entries) to one of 38 query languages, defaulting to English.
 
-#### `medListEl.addEventListener('change', renderResults)`
+**Geolocation permission is never requested**, and that is a design decision, not an omission:
 
-**Trigger:** Any change event on any checkbox within `#med-list`.
+- Google Maps already centres a "nearby" search on the device, so coordinates are not needed for the search to work at all.
+- The only thing location decides is the query language, and the timezone answers that with no prompt, no API key, no network call and nothing personal leaving the page.
+- A permission dialog on a medical page costs trust, and every user who declines loses the feature outright.
 
-**Behavior:** Delegated event listener, calls `renderResults()` whenever a checkbox is toggled.
+The cost is that a VPN reports the wrong zone, so the UI carries a language override persisted to `localStorage`.
 
----
+Only zones whose language is **not** English are listed in the table; everything else falls through to the English default, which Maps handles well worldwide.
 
-#### `#clear-btn click handler`
+One trap worth preserving: the Thai studio query is `ร้านสัก`, never bare `สัก`, which also means teak and returns timber yards.
 
-**Trigger:** Click on the dynamically injected "Clear all" button.
+`geo-search.js` has an offline self-check. Run `node js/geo-search.js` to assert every language has all four terms, every mapped zone points at a known language, and unknown languages fall back correctly.
 
-**Behavior:** Unchecks all `input[data-med-id]:checked` elements and clears the result container.
+## Evidence and sourcing
 
----
+The rules that govern content are stricter than the ones that govern code.
 
-### PostMessage API (Embedding)
+- **Unsupported claims do not ship.** Alcohol, ibuprofen and naproxen were each described as pushing ink out of the skin. Two Europe PMC literature passes found no evidence for it. The text now states that the effect on ink retention has not been studied.
+- **Citations attach on proof.** A bare identifier next to a sentence is unverified until a human confirms the paper supports that sentence. `medication-sources.js` only ever receives approved citations.
+- **Absence of data is written as absence of data**, never as safety.
 
-#### `message` event listener
+When searching literature for a claim, sort by relevance rather than citation count. Sorting by citations returns whatever is most famous in the field, not what is most relevant to the question.
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `e.data.type` | `string` | Must equal `"poli-theme"` |
-| `e.data.light` | `boolean` | `true` for light theme, `false` for dark theme |
+## State and storage
 
-**Behavior:** Sets `data-theme` attribute on `<html>` element to `"light"` or `"dark"`. Only active when tool is loaded in an iframe (`window.self !== window.top`).
+All state is client-side. Nothing is transmitted anywhere.
 
-## Integration Guide
+| `localStorage` key | Holds |
+|---|---|
+| `ui_lang_v1` | Chosen interface language |
+| `geo_search_lang_v1` | Manual override for the Maps query language |
+| `readiness_assessment_autosave_v1` | Prep calculator and readiness form values |
+| `recent_searches_v1` | Recent medication searches |
+| `appointment_datetime` | Appointment time for washout countdowns |
 
-### Standalone Embedding
+Every read and write is wrapped in `try/catch`; private windows and blocked site data must not break the page.
 
-The tool is fully self-contained static HTML/CSS/JS with zero external dependencies. Embed via iframe:
+## Embedding
 
 ```html
-<iframe
-  src="https://poliinternational.com/tools/medication-interaction-checker/"
-  width="100%"
-  height="800"
-  frameborder="0"
-  title="Medication Interaction Checker"
-></iframe>
+<iframe src="https://poliinternational.com/tools/medication-interaction-checker/"
+        width="100%" height="900" style="border:0"
+        title="Medication Interaction Checker"></iframe>
 ```
 
-### Theme Control (Iframe)
+The page detects `window.self !== window.top` and defaults to dark, then listens for a theme message:
 
-When embedded, the tool listens for `postMessage` events to sync with a parent page theme:
-
-```javascript
-// From parent page, switch to light theme
-document.querySelector('iframe').contentWindow.postMessage({
-  type: 'poli-theme',
-  light: true
-}, '*');
-
-// Switch to dark theme
-document.querySelector('iframe').contentWindow.postMessage({
-  type: 'poli-theme',
-  light: false
-}, '*');
+```js
+iframe.contentWindow.postMessage({ type: 'poli-theme', light: true }, '*');
 ```
 
-### Important Notes
-
-- The tool sets `noindex, nofollow` meta robots tag, it is designed for embedding, not standalone SEO.
-- No API keys, backend services, or external resources are required.
-- All data is hardcoded in the JavaScript, no network requests are made.
+`index.html` carries `noindex, nofollow` so an embedded copy never competes with the canonical page in search results. Remove that meta tag if you are self-hosting as your own primary page.
 
 ## Customization
 
-### Adding Medications
+**Add a medication:** append to the relevant `CATEGORIES[].meds` array in `app.js`. Only `id`, `name`, `cat`, `sev`, `tattoo` and `piercing` are required. Then add the six translations to `med-content-i18n.js` under the same `id`, or it will fall back to English and show the fallback notice.
 
-Edit the `CATEGORIES` array in `js/app.js`. Each medication object requires:
+**Add a language:** add a `TRANSLATIONS` block for the interface, add the language to every medication in `med-content-i18n.js`, and read that file's terminology header first so the trade vocabulary stays consistent. A partial language is worse than none.
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `id` | Yes | Unique string identifier (used for checkbox values) |
-| `name` | Yes | Display name |
-| `sub` | Yes | Subtype or brand name (shown in small text) |
-| `sev` | Yes | Severity level: `"high"`, `"mod"`, or `"low"` |
-| `tattoo` | Yes | Tattoo-specific interaction text |
-| `piercing` | Yes | Piercing-specific interaction text |
-| `wait` | No | Wait time or guidance note (shown with ⏱ icon) |
+**Add a Maps query language:** add a `GEO_SEARCH_TERMS` entry, an endonym in `GEO_SEARCH_LANG_NAMES`, and the relevant timezones in `GEO_SEARCH_ZONES`. Then run `node js/geo-search.js`.
 
-### Adding Categories
-
-Add a new object to the `CATEGORIES` array:
-
-```javascript
-{
-  label: "New Category Name",
-  meds: [ /* array of medication objects */ ]
-}
-```
-
-### Styling
-
-All visual styling is in `css/style.css`. Key CSS custom properties used by the JavaScript:
-
-```css
-:root {
-  --sev-high: /* color for high severity */;
-  --sev-mod:  /* color for moderate severity */;
-  --sev-low:  /* color for low severity */;
-  --text-muted: /* muted text color */;
-}
-```
-
-## Performance
-
-- **Zero network requests**, All data is hardcoded in the JavaScript bundle.
-- **DOM updates only on interaction**, `renderResults()` only fires on checkbox change events.
-- **No animations or transitions**, Minimal repaint cost.
-- **No external libraries**, Vanilla JS keeps payload under 10KB uncompressed.
-- **Event delegation**, Single `change` listener on the container, not individual checkboxes.
-
-## Browser Compatibility
-
-- **ES6 features used:** `const`, `let`, arrow functions, template literals, `Array.from()`, `Array.prototype.sort()`, `Map` iteration.
-- **Requires:** Modern browsers with ES6 support (Chrome 49+, Firefox 52+, Safari 10+, Edge 14+, Opera 36+).
-- **No polyfills provided**, Not compatible with Internet Explorer 11 or older browsers without transpilation.
+**Restyle:** everything derives from CSS custom properties on `:root` with a `.light-mode` override. Change the tokens, not the components.
 
 ## Security
 
-### Input Handling
+- **All interpolated content passes through `escHtml()`**, which escapes `&`, `<`, `>` and `"`. Template literals build the DOM, so any unescaped value would be an injection point.
+- **No user input is transmitted.** There is no backend, no analytics call and no third-party script.
+- **Maps links carry `rel="noopener noreferrer"`** and open in a new tab.
+- **No credential, payment or identity input exists anywhere in the tool.**
 
-- All user-facing text is sanitized through `escHtml()` before being injected into the DOM via `innerHTML`.
-- Checkbox values are read from `data-med-id` attributes, not from user input.
-- No form submission, no URL parameters, no localStorage, no cookies.
+## Browser support
 
-### XSS Prevention
+Any browser with ES2015, `Intl`, CSS custom properties and `localStorage`: Chrome, Edge, Firefox, Safari, and their mobile equivalents. There is no polyfill layer and no transpilation step.
 
-- The `escHtml()` function escapes `&`, `<`, `>`, and `"` characters.
-- Medication data is hardcoded, no dynamic content from external sources.
-- No `eval()`, `document.write()`, or `setTimeout()` with string arguments.
+---
 
-### Iframe Security
+## Support
 
-- The tool sets `noindex, nofollow` to prevent direct search indexing.
-- Theme synchronization uses `postMessage` with no sensitive data transmission.
-- No `allow-scripts` or `allow-same-origin` sandbox restrictions imposed, embedder should apply appropriate sandbox attributes.
-
-## Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | Initial release | Core medication interaction checker with 7 categories, 17 medications, severity sorting, and iframe embedding support |
-
-## Support / Contact
-
-For technical support, integration questions, or to request additions to the medication database:
-
-**Email:** support@poliinternational.com
-
-**Note:** This tool is an educational reference only and does not constitute medical advice. Never stop or adjust prescribed medication without consulting a physician.
+- Email: <support@poliinternational.com>
+- Issues: <https://github.com/Poli-International/medication-interaction-checker/issues>
