@@ -621,6 +621,10 @@ const TRANSLATIONS = {
     geoFindPharmacy: '💊 Nearest pharmacy',
     geoFindHospital: '🏥 Nearest hospital',
     geoNote: 'These open Google Maps and search in the local language of where you are, which finds far more than an English search does abroad. Your location is never sent to us - only a search word goes to Google. Change the language above if it guessed wrong.',
+    emergHeadSub: 'Immediate step-by-step action guides for studio staff during procedural complications.',
+    emergCallLabel: 'Call emergency services first:',
+    emergCallConfirm: 'This number is guessed from your device time zone and can be wrong, for example on a VPN. Confirm the correct number for your country and keep it written on the studio wall.',
+    emergDisclaimer: 'This guide is a memory aid for people who are already trained in first aid. It is not first-aid training, and it does not replace it. Call emergency services first, do nothing you are not trained and permitted to do where you work, and stay with the person until help arrives.',
     disclaimerTitle: 'Important Disclaimer:',
     disclaimerBody: 'This tool is an educational reference only and does not constitute medical advice. Never stop or adjust prescribed medication without consulting your prescribing physician. Always inform your tattoo artist and piercer of any medications, health conditions, or supplements you are taking before the procedure.',
     langLabel: '🌐 Language:',
@@ -680,6 +684,10 @@ const TRANSLATIONS = {
     geoFindPharmacy: '💊 Pharmacie la plus proche',
     geoFindHospital: '🏥 Hôpital le plus proche',
     geoNote: 'Ces liens ouvrent Google Maps et lancent la recherche dans la langue du pays où vous vous trouvez, ce qui donne bien plus de résultats qu\'une recherche en anglais à l\'étranger. Votre position ne nous est jamais transmise : seul un mot de recherche est envoyé à Google. Changez la langue ci-dessus si la détection est incorrecte.',
+    emergHeadSub: 'Guides d\'action immédiats, étape par étape, pour le personnel du studio en cas de complication pendant une seance.',
+    emergCallLabel: 'Appelez d\'abord les secours :',
+    emergCallConfirm: 'Ce numéro est déduit du fuseau horaire de votre appareil et peut être faux, par exemple derriere un VPN. Vérifiez le numéro correct pour votre pays et gardez-le écrit au mur du studio.',
+    emergDisclaimer: 'Ce guide est un aide-mémoire destiné à des personnes déjà formées aux premiers secours. Ce n\'est pas une formation aux premiers secours et cela ne la remplace pas. Appelez d\'abord les secours, ne faites rien pour quoi vous n\'êtes ni formé ni autorisé là où vous exercez, et restez auprès de la personne jusqu\'à l\'arrivée des secours.',
     disclaimerTitle: 'Avertissement important :',
     disclaimerBody: 'Cet outil est une référence éducative uniquement et ne constitue pas un avis médical. N\'arrêtez et ne modifiez jamais un médicament prescrit sans consulter le médecin qui vous l\'a prescrit. Informez toujours votre tatoueur et votre perceur de tout médicament, problème de santé ou complément alimentaire que vous prenez avant l\'intervention.',
     langLabel: '🌐 Langue:',
@@ -739,6 +747,10 @@ const TRANSLATIONS = {
     geoFindPharmacy: '💊 Farmacia più vicina',
     geoFindHospital: '🏥 Ospedale più vicino',
     geoNote: 'Questi link aprono Google Maps e cercano nella lingua del posto in cui ti trovi: all\'estero trova molto più di una ricerca in inglese. La tua posizione non arriva mai a noi: a Google va solo una parola di ricerca. Cambia la lingua qui sopra se il rilevamento è sbagliato.',
+    emergHeadSub: 'Guide di intervento immediato, passo per passo, per il personale dello studio in caso di complicazioni durante una seduta.',
+    emergCallLabel: 'Chiami prima i soccorsi:',
+    emergCallConfirm: 'Questo numero è dedotto dal fuso orario del suo dispositivo e può essere sbagliato, per esempio dietro una VPN. Verifichi il numero corretto per il suo paese e lo tenga scritto sul muro dello studio.',
+    emergDisclaimer: 'Questa guida è un promemoria per chi ha già una formazione di primo soccorso. Non è un corso di primo soccorso e non lo sostituisce. Chiami prima i soccorsi, non faccia nulla per cui non è formato e autorizzato dove lavora, e resti accanto alla persona fino all\'arrivo dei soccorsi.',
     disclaimerTitle: 'Avvertenza importante:',
     disclaimerBody: 'Questo strumento è solo un riferimento educativo e non costituisce un parere medico. Non interrompere né modificare mai un farmaco prescritto senza consultare il medico che lo ha prescritto. Informa sempre il tuo tatuatore e il tuo piercer di qualsiasi farmaco, condizione di salute o integratore che stai assumendo prima della procedura.',
     langLabel: '🌐 Lingua:',
@@ -798,6 +810,10 @@ const TRANSLATIONS = {
     geoFindPharmacy: '💊 Farmacia más cercana',
     geoFindHospital: '🏥 Hospital más cercano',
     geoNote: 'Estos enlaces abren Google Maps y buscan en el idioma del lugar donde está, lo que encuentra mucho más que una búsqueda en inglés en el extranjero. Su ubicación nunca llega hasta nosotros: a Google solo va una palabra de búsqueda. Cambie el idioma de arriba si la detección no es correcta.',
+    emergHeadSub: 'Guías de actuación inmediata, paso a paso, para el personal del estudio ante complicaciones durante una sesion.',
+    emergCallLabel: 'Llame primero a los servicios de emergencia:',
+    emergCallConfirm: 'Este número se deduce de la zona horaria de su dispositivo y puede ser incorrecto, por ejemplo con una VPN. Confirme el número correcto de su país y téngalo escrito en la pared del estudio.',
+    emergDisclaimer: 'Esta guía es un recordatorio para personas que ya tienen formación en primeros auxilios. No es formación en primeros auxilios ni la sustituye. Llame primero a emergencias, no haga nada para lo que no esté formado y autorizado donde trabaja, y quédese con la persona hasta que llegue la ayuda.',
     disclaimerTitle: 'Aviso importante:',
     disclaimerBody: 'Esta herramienta es solo una referencia educativa y no constituye asesoramiento médico. Nunca suspenda ni modifique un medicamento recetado sin consultar al médico que se lo recetó. Informe siempre a su tatuador y a su perforador de cualquier medicamento, problema de salud o suplemento que esté tomando antes del procedimiento.',
     langLabel: '🌐 Idioma:',
@@ -857,6 +873,10 @@ const TRANSLATIONS = {
     geoFindPharmacy: '💊 Nächste Apotheke',
     geoFindHospital: '🏥 Nächstes Krankenhaus',
     geoNote: 'Diese Links öffnen Google Maps und suchen in der Landessprache Ihres Aufenthaltsorts, was im Ausland weit mehr findet als eine englische Suche. Ihr Standort erreicht uns nie: an Google geht nur ein Suchwort. Ändern Sie oben die Sprache, falls die Erkennung falsch liegt.',
+    emergHeadSub: 'Sofortige Schritt-für-Schritt-Anleitungen für das Studiopersonal bei Komplikationen während einer Sitzung.',
+    emergCallLabel: 'Rufen Sie zuerst den Rettungsdienst:',
+    emergCallConfirm: 'Diese Nummer wird aus der Zeitzone Ihres Geräts abgeleitet und kann falsch sein, etwa hinter einem VPN. Prüfen Sie die richtige Nummer für Ihr Land und halten Sie sie im Studio an der Wand fest.',
+    emergDisclaimer: 'Dieser Leitfaden ist eine Gedächtnisstütze für Menschen, die bereits in Erster Hilfe ausgebildet sind. Er ist keine Erste-Hilfe-Ausbildung und ersetzt sie nicht. Rufen Sie zuerst den Rettungsdienst, tun Sie nichts, wofür Sie an Ihrem Arbeitsort nicht ausgebildet und befugt sind, und bleiben Sie bei der Person, bis Hilfe eintrifft.',
     disclaimerTitle: 'Wichtiger Hinweis:',
     disclaimerBody: 'Dieses Tool ist nur eine Bildungsreferenz und stellt keine medizinische Beratung dar. Setzen Sie verschriebene Medikamente niemals ohne Rücksprache mit Ihrem verschreibenden Arzt ab und ändern Sie sie nicht. Informieren Sie Ihren Tätowierer und Piercer immer über alle Medikamente, Gesundheitszustände oder Nahrungsergänzungsmittel, die Sie vor dem Eingriff einnehmen.',
     langLabel: '🌐 Sprache:',
@@ -916,6 +936,10 @@ const TRANSLATIONS = {
     geoFindPharmacy: '💊 Dichtstbijzijnde apotheek',
     geoFindHospital: '🏥 Dichtstbijzijnde ziekenhuis',
     geoNote: 'Deze links openen Google Maps en zoeken in de taal van het land waar je bent. Dat levert in het buitenland veel meer op dan een Engelse zoekopdracht. Je locatie bereikt ons nooit: naar Google gaat alleen een zoekwoord. Wijzig hierboven de taal als de detectie ernaast zit.',
+    emergHeadSub: 'Directe stap-voor-stap handelingsgidsen voor studiomedewerkers bij complicaties tijdens een sessie.',
+    emergCallLabel: 'Bel eerst de hulpdiensten:',
+    emergCallConfirm: 'Dit nummer is afgeleid van de tijdzone van je apparaat en kan verkeerd zijn, bijvoorbeeld achter een VPN. Controleer het juiste nummer voor jouw land en hang het in de studio aan de muur.',
+    emergDisclaimer: 'Deze gids is een geheugensteun voor mensen die al EHBO-geschoold zijn. Het is geen EHBO-opleiding en vervangt die niet. Bel eerst de hulpdiensten, doe niets waarvoor je op je werkplek niet geschoold en bevoegd bent, en blijf bij de persoon tot er hulp is.',
     disclaimerTitle: 'Belangrijke disclaimer:',
     disclaimerBody: 'Deze tool is alleen een educatieve referentie en vormt geen medisch advies. Stop of wijzig voorgeschreven medicatie nooit zonder overleg met uw voorschrijvend arts. Informeer uw tatoeëerder en piercer altijd over alle medicijnen, gezondheidsproblemen of supplementen die u gebruikt vóór de behandeling.',
     langLabel: '🌐 Taal:',
@@ -975,6 +999,10 @@ const TRANSLATIONS = {
     geoFindPharmacy: '💊 Farmácia mais próxima',
     geoFindHospital: '🏥 Hospital mais próximo',
     geoNote: 'Estas ligações abrem o Google Maps e pesquisam na língua do local onde está, o que encontra muito mais do que uma pesquisa em inglês no estrangeiro. A sua localização nunca chega até nós: para a Google vai apenas uma palavra de pesquisa. Mude a língua acima se a deteção estiver errada.',
+    emergHeadSub: 'Guias de atuação imediata, passo a passo, para o pessoal do estudio perante complicações durante uma sessão.',
+    emergCallLabel: 'Ligue primeiro para a emergência:',
+    emergCallConfirm: 'Este número é deduzido do fuso horário do seu dispositivo e pode estar errado, por exemplo atrás de uma VPN. Confirme o número correto do seu país e mantenha-o escrito na parede do estúdio.',
+    emergDisclaimer: 'Este guia é um lembrete para quem já tem formação em primeiros socorros. Não é formação em primeiros socorros nem a substitui. Ligue primeiro para a emergência, não faça nada para que não esteja formado e autorizado onde trabalha, e fique junto da pessoa até a ajuda chegar.',
     disclaimerTitle: 'Aviso importante:',
     disclaimerBody: 'Esta ferramenta é apenas uma referência educativa e não constitui aconselhamento médico. Nunca pare nem ajuste medicamentos prescritos sem consultar o médico que os prescreveu. Informe sempre o seu tatuador e o seu body piercer sobre quaisquer medicamentos, problemas de saúde ou suplementos que esteja a tomar antes do procedimento.',
     langLabel: '🌐 Idioma:',
@@ -3134,6 +3162,12 @@ function initEmergencyModal() {
   if (!modal || !openBtn) return;
 
   openBtn.addEventListener('click', () => {
+    // Filled on open rather than at load, so a device that changes time zone
+    // mid-session (a phone landing in another country) shows the new number.
+    const numEl = document.getElementById('emergency-local-number');
+    if (numEl && typeof geoEmergencyNumber === 'function') {
+      numEl.textContent = geoEmergencyNumber();
+    }
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
   });

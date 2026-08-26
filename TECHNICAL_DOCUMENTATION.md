@@ -151,6 +151,23 @@ One trap worth preserving: the Thai studio query is `ร้านสัก`, nev
 
 `geo-search.js` has an offline self-check. Run `node js/geo-search.js` to assert every language has all four terms, every mapped zone points at a known language, and unknown languages fall back correctly.
 
+### The local emergency number
+
+`geoEmergencyNumber()` resolves the same timezone to a local emergency number:
+172 zones map to 19 numbers, and anything unmapped falls back to `112 / 911`.
+
+**This table has the opposite risk profile to the Maps terms above, and is built
+accordingly.** A wrong Maps query returns nothing; a wrong emergency number costs
+time in the one situation where time is the whole problem. So only well-established
+numbers are listed, nothing is guessed, and the UI always prints "confirm the correct
+number for your country and keep it on the studio wall" beside the detected value.
+Where a country runs a dedicated ambulance line separate from the police one (Norway
+113, Switzerland 144, Brazil 192, Russia 103) the **medical** number is listed: this
+guide is opened for anaphylaxis and bleeding, not for a crime.
+
+The number is filled when the modal opens rather than at page load, so a phone that
+lands in another country shows the new number without a reload.
+
 ## Evidence and sourcing
 
 The rules that govern content are stricter than the ones that govern code.

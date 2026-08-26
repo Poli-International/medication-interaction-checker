@@ -151,6 +151,24 @@ Una trampa que conviene conservar: la consulta tailandesa para un estudio es `�
 
 `geo-search.js` incluye una comprobación sin conexión. Ejecute `node js/geo-search.js` para verificar que cada idioma tiene los cuatro términos, que cada zona asignada apunta a un idioma conocido y que los idiomas desconocidos recaen correctamente en el inglés.
 
+### El número de emergencias local
+
+`geoEmergencyNumber()` convierte la misma zona horaria en un número de emergencias local:
+172 zonas apuntan a 19 números, y cualquier zona sin asignar recae en `112 / 911`.
+
+**Esta tabla tiene el perfil de riesgo contrario al de los términos de Maps de arriba, y
+está construida en consecuencia.** Una consulta de Maps equivocada no devuelve nada; un
+número de emergencias equivocado cuesta tiempo en la única situación en la que el tiempo
+es todo el problema. Por eso solo se listan números bien establecidos, no se adivina
+nada, y la interfaz siempre imprime « confirme el número correcto de su país y téngalo
+en la pared del estudio » junto al valor detectado. Donde un país tiene una línea de
+ambulancia distinta de la de policía (Noruega 113, Suiza 144, Brasil 192, Rusia 103) se
+indica el número **médico**: esta guía se abre por una anafilaxia o una hemorragia, no
+por un delito.
+
+El número se rellena al abrir la ventana y no al cargar la página, de modo que un
+teléfono que aterriza en otro país muestra el nuevo número sin recargar.
+
 ## Pruebas y fuentes
 
 Las reglas que gobiernan el contenido son más estrictas que las que gobiernan el código.

@@ -151,6 +151,24 @@ Eén valkuil die behouden moet blijven: de Thaise zoekterm voor een studio is `�
 
 `geo-search.js` heeft een offline zelfcontrole. Draai `node js/geo-search.js` om te controleren dat elke taal alle vier de termen heeft, dat elke gekoppelde zone naar een bekende taal wijst en dat onbekende talen correct op Engels terugvallen.
 
+### Het lokale alarmnummer
+
+`geoEmergencyNumber()` zet dezelfde tijdzone om in een lokaal alarmnummer: 172 zones
+verwijzen naar 19 nummers, en elke niet-gekoppelde zone valt terug op `112 / 911`.
+
+**Deze tabel heeft het omgekeerde risicoprofiel van de Maps-termen hierboven en is daar
+ook naar gebouwd.** Een verkeerde Maps-zoekopdracht levert niets op; een verkeerd
+alarmnummer kost tijd in de enige situatie waarin tijd het hele probleem is. Daarom staan
+er alleen goed vastgelegde nummers in, wordt er niets gegokt, en drukt de interface naast
+de gedetecteerde waarde altijd af: "controleer het juiste nummer voor jouw land en hang
+het in de studio aan de muur". Waar een land een aparte ambulancelijn naast de politie
+heeft (Noorwegen 113, Zwitserland 144, Brazilië 192, Rusland 103) staat het **medische**
+nummer vermeld: deze gids wordt geopend bij anafylaxie en bloeding, niet bij een misdrijf.
+
+Het nummer wordt ingevuld bij het openen van het venster en niet bij het laden van de
+pagina, zodat een telefoon die in een ander land landt het nieuwe nummer toont zonder
+herladen.
+
 ## Bewijs en bronnen
 
 De regels voor de inhoud zijn strenger dan die voor de code.

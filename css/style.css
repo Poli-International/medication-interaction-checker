@@ -2387,3 +2387,45 @@ body.modal-open {
   color: var(--text-muted);
   max-width: 68ch;
 }
+
+/* Emergency modal: call-first banner and the modal's own disclaimer.
+   The page-level disclaimer was written for a drug list and says nothing
+   about emergencies, so this modal carries its own. */
+.emergency-callfirst {
+  margin: 0 1.25rem 0.75rem;
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--sev-high);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--sev-high) 12%, transparent);
+}
+.emergency-number-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+.emergency-number-line strong {
+  font-size: 1.55rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--sev-high);
+}
+.emergency-number-confirm {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.emergency-disclaimer {
+  margin: 0 1.25rem 1rem;
+  padding: 0.7rem 0.9rem;
+  border-left: 3px solid var(--border);
+  border-radius: 0 8px 8px 0;
+  background: var(--bg-input);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}

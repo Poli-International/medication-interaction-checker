@@ -188,6 +188,117 @@ function geoSearchUrl(kind, lang) {
   return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(term);
 }
 
+// ---------------------------------------------------------------------------
+// LOCAL EMERGENCY NUMBER
+//
+// The emergency guide used to print "911 / 112" for everyone. That is wrong in
+// Thailand (medical line 1669), the UK (999), Australia (000) and plenty more,
+// and this tool is read in seven languages by people who travel.
+//
+// RISK PROFILE - THE OPPOSITE OF THE MAPS TABLE ABOVE. A wrong Maps query just
+// returns nothing. A wrong emergency number costs time in the one situation
+// where time is the whole problem. So this fails safe in three ways:
+//   1. only well-established numbers are listed, nothing guessed;
+//   2. anything unmapped falls back to "112 / 911", which between them reach a
+//      dispatcher across Europe, North America and most GSM mobiles;
+//   3. the UI always prints the "confirm your own local number" line beside it,
+//      because a studio sits in ONE country and should have that number on the
+//      wall rather than trusting a timezone guess.
+//
+// Where a country runs a dedicated ambulance line separate from the police one
+// (Norway 113, Switzerland 144, Brazil 192, Russia 103), the MEDICAL number is
+// listed: this guide is opened for anaphylaxis and bleeding, not for a crime.
+//
+// Grouped by number rather than by zone so it can be read and checked at a
+// glance; it is inverted into a lookup at load.
+const GEO_EMERGENCY_BY_NUMBER = {
+  '911': [
+    'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+    'America/Phoenix', 'America/Anchorage', 'America/Adak', 'America/Detroit',
+    'America/Boise', 'America/Juneau', 'America/Sitka', 'America/Nome',
+    'America/Menominee', 'America/Indiana/Indianapolis', 'America/Kentucky/Louisville',
+    'America/North_Dakota/Center', 'America/Toronto', 'America/Montreal',
+    'America/Vancouver', 'America/Edmonton', 'America/Winnipeg', 'America/Halifax',
+    'America/St_Johns', 'America/Regina', 'America/Whitehorse', 'America/Yellowknife',
+    'America/Iqaluit', 'America/Moncton', 'America/Mexico_City', 'America/Cancun',
+    'America/Monterrey', 'America/Tijuana', 'America/Merida', 'America/Chihuahua',
+    'America/Mazatlan', 'America/Hermosillo', 'America/Matamoros', 'America/Ojinaga',
+    'America/Bahia_Banderas', 'America/Panama', 'Asia/Manila', 'America/Puerto_Rico',
+  ],
+  '112': [
+    'Europe/Amsterdam', 'Europe/Brussels', 'Europe/Luxembourg', 'Europe/Paris',
+    'Europe/Monaco', 'Europe/Madrid', 'Europe/Andorra', 'Europe/Lisbon',
+    'Europe/Rome', 'Europe/San_Marino', 'Europe/Vatican', 'Europe/Malta',
+    'Europe/Berlin', 'Europe/Vienna', 'Europe/Vaduz', 'Europe/Busingen',
+    'Europe/Copenhagen', 'Europe/Stockholm', 'Europe/Helsinki', 'Europe/Mariehamn',
+    'Europe/Tallinn', 'Europe/Riga', 'Europe/Vilnius', 'Europe/Warsaw',
+    'Europe/Prague', 'Europe/Bratislava', 'Europe/Budapest', 'Europe/Bucharest',
+    'Europe/Chisinau', 'Europe/Sofia', 'Europe/Athens', 'Europe/Nicosia',
+    'Europe/Zagreb', 'Europe/Sarajevo', 'Europe/Belgrade', 'Europe/Podgorica',
+    'Europe/Ljubljana', 'Europe/Istanbul', 'Europe/Dublin', 'Atlantic/Reykjavik',
+    'Atlantic/Canary', 'Atlantic/Madeira', 'Atlantic/Azores', 'Europe/Isle_of_Man',
+    'Europe/Guernsey', 'Europe/Jersey', 'Asia/Istanbul', 'Asia/Nicosia',
+    'Asia/Famagusta', 'Asia/Kolkata', 'Asia/Jakarta', 'Asia/Makassar',
+    'Asia/Jayapura', 'Asia/Pontianak', 'Africa/Johannesburg',
+  ],
+  '999': ['Europe/London', 'Asia/Hong_Kong', 'Asia/Kuala_Lumpur', 'Asia/Kuching'],
+  '000': [
+    'Australia/Sydney', 'Australia/Melbourne', 'Australia/Brisbane',
+    'Australia/Perth', 'Australia/Adelaide', 'Australia/Hobart',
+    'Australia/Darwin', 'Australia/Canberra',
+  ],
+  '111': ['Pacific/Auckland'],
+  '1669': ['Asia/Bangkok'],
+  '119': ['Asia/Tokyo', 'Asia/Seoul', 'Asia/Taipei'],
+  '120': ['Asia/Shanghai', 'Asia/Chongqing', 'Asia/Urumqi', 'Asia/Harbin', 'Asia/Macau'],
+  '995': ['Asia/Singapore'],
+  '115': ['Asia/Ho_Chi_Minh', 'Asia/Saigon', 'Asia/Hanoi'],
+  '192': [
+    'America/Sao_Paulo', 'America/Bahia', 'America/Fortaleza', 'America/Recife',
+    'America/Manaus', 'America/Belem', 'America/Cuiaba', 'America/Campo_Grande',
+    'America/Porto_Velho', 'America/Rio_Branco', 'America/Boa_Vista',
+    'America/Santarem', 'America/Maceio', 'America/Araguaina', 'America/Noronha',
+  ],
+  '107': [
+    'America/Argentina/Buenos_Aires', 'America/Argentina/Cordoba',
+    'America/Argentina/Mendoza', 'America/Argentina/Salta',
+    'America/Argentina/Tucuman', 'America/Argentina/Ushuaia',
+  ],
+  '131': ['America/Santiago'],
+  '113': ['Europe/Oslo'],
+  '144': ['Europe/Zurich'],
+  '101': ['Asia/Jerusalem', 'Asia/Tel_Aviv'],
+  '103': [
+    'Europe/Moscow', 'Europe/Kaliningrad', 'Europe/Samara', 'Europe/Volgograd',
+    'Europe/Saratov', 'Europe/Astrakhan', 'Europe/Ulyanovsk', 'Europe/Kirov',
+    'Europe/Kiev', 'Europe/Kyiv', 'Europe/Minsk', 'Asia/Vladivostok',
+    'Asia/Novosibirsk', 'Asia/Yekaterinburg', 'Asia/Krasnoyarsk', 'Asia/Irkutsk',
+    'Asia/Yakutsk', 'Asia/Omsk', 'Asia/Magadan', 'Asia/Kamchatka', 'Asia/Sakhalin',
+  ],
+  '998': ['Asia/Dubai'],
+  '997': ['Asia/Riyadh'],
+};
+
+const GEO_EMERGENCY_FALLBACK = '112 / 911';
+
+const GEO_EMERGENCY_ZONES = (function () {
+  const out = {};
+  Object.keys(GEO_EMERGENCY_BY_NUMBER).forEach(function (num) {
+    GEO_EMERGENCY_BY_NUMBER[num].forEach(function (zone) { out[zone] = num; });
+  });
+  return out;
+})();
+
+/** Best-guess local emergency number, or the 112/911 fallback. */
+function geoEmergencyNumber() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return GEO_EMERGENCY_ZONES[tz] || GEO_EMERGENCY_FALLBACK;
+  } catch (e) {
+    return GEO_EMERGENCY_FALLBACK;
+  }
+}
+
 /* Offline self-check: node js/geo-search.js */
 if (typeof module !== 'undefined' && require.main === module) {
   const assert = require('assert');
@@ -202,6 +313,24 @@ if (typeof module !== 'undefined' && require.main === module) {
   assert(GEO_SEARCH_TERMS.th.studio !== 'สัก', 'bare Thai สัก also means teak');
   assert(geoSearchUrl('pharmacy', 'th').includes(encodeURIComponent('ร้านขายยา')));
   assert(geoSearchUrl('pharmacy', 'xx') === geoSearchUrl('pharmacy', 'en'), 'unknown lang must fall back');
+  // Emergency numbers. A wrong one here is the dangerous failure, so the
+  // checks are stricter than for the Maps terms.
+  const seen = {};
+  Object.entries(GEO_EMERGENCY_BY_NUMBER).forEach(([num, zones]) => {
+    assert(/^[0-9]{3,4}$/.test(num), 'implausible emergency number: ' + num);
+    zones.forEach((z) => {
+      assert(!seen[z], z + ' listed under both ' + seen[z] + ' and ' + num);
+      seen[z] = num;
+    });
+  });
+  assert(GEO_EMERGENCY_ZONES['Asia/Bangkok'] === '1669', 'Thailand must be 1669');
+  assert(GEO_EMERGENCY_ZONES['Europe/London'] === '999', 'UK must be 999');
+  assert(GEO_EMERGENCY_ZONES['Australia/Sydney'] === '000', 'Australia must be 000');
+  assert(GEO_EMERGENCY_ZONES['Pacific/Auckland'] === '111', 'NZ must be 111');
+  assert(GEO_EMERGENCY_ZONES['Nowhere/Nothing'] === undefined, 'unknown zone must be unmapped');
+  console.log('emergency numbers OK:', Object.keys(seen).length, 'zones,',
+    Object.keys(GEO_EMERGENCY_BY_NUMBER).length, 'distinct numbers, fallback',
+    GEO_EMERGENCY_FALLBACK);
   console.log('geo-search self-check OK:',
     Object.keys(GEO_SEARCH_TERMS).length, 'languages,',
     Object.keys(GEO_SEARCH_ZONES).length, 'mapped zones');

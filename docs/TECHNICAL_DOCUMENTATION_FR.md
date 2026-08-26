@@ -151,6 +151,24 @@ Un piège à conserver : la requête thaïe pour un studio est `ร้านส�
 
 `geo-search.js` embarque une vérification hors ligne. Lancez `node js/geo-search.js` pour contrôler que chaque langue possède les quatre termes, que chaque fuseau cartographié pointe vers une langue connue, et que les langues inconnues retombent correctement sur l'anglais.
 
+### Le numéro des secours locaux
+
+`geoEmergencyNumber()` convertit le même fuseau horaire en numéro d'urgence local :
+172 fuseaux renvoient vers 19 numéros, et tout fuseau inconnu retombe sur `112 / 911`.
+
+**Cette table a le profil de risque inverse de celui des termes Maps ci-dessus, et elle
+est construite en conséquence.** Une mauvaise requête Maps ne renvoie rien ; un mauvais
+numéro d'urgence coûte du temps dans la seule situation où le temps est tout le
+problème. Seuls des numéros bien établis sont donc listés, rien n'est deviné, et
+l'interface affiche toujours « vérifiez le numéro correct pour votre pays et gardez-le
+au mur du studio » à côté de la valeur détectée. Lorsqu'un pays dispose d'une ligne
+d'ambulance distincte de celle de la police (Norvège 113, Suisse 144, Brésil 192,
+Russie 103), c'est le numéro **médical** qui est retenu : ce guide s'ouvre pour une
+anaphylaxie ou une hémorragie, pas pour un délit.
+
+Le numéro est rempli à l'ouverture de la fenêtre et non au chargement de la page, afin
+qu'un téléphone arrivant dans un autre pays affiche le nouveau numéro sans rechargement.
+
 ## Preuves et sources
 
 Les règles qui gouvernent le contenu sont plus strictes que celles qui gouvernent le code.

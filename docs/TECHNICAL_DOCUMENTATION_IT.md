@@ -151,6 +151,24 @@ Una trappola da conservare: la ricerca thailandese per uno studio è `ร้า�
 
 `geo-search.js` include un controllo offline. Esegui `node js/geo-search.js` per verificare che ogni lingua abbia i quattro termini, che ogni fuso mappato punti a una lingua nota e che le lingue sconosciute ricadano correttamente sull'inglese.
 
+### Il numero dei soccorsi locali
+
+`geoEmergencyNumber()` converte lo stesso fuso orario in un numero di emergenza locale:
+172 fusi rimandano a 19 numeri, e qualunque fuso non mappato ricade su `112 / 911`.
+
+**Questa tabella ha il profilo di rischio opposto a quello dei termini Maps qui sopra, ed
+è costruita di conseguenza.** Una ricerca Maps sbagliata non restituisce nulla; un numero
+di emergenza sbagliato costa tempo nell'unica situazione in cui il tempo è tutto il
+problema. Sono quindi elencati solo numeri ben consolidati, nulla è indovinato, e
+l'interfaccia stampa sempre « verifichi il numero corretto per il suo paese e lo tenga
+sul muro dello studio » accanto al valore rilevato. Dove un paese ha una linea di
+ambulanza distinta da quella della polizia (Norvegia 113, Svizzera 144, Brasile 192,
+Russia 103) viene indicato il numero **medico**: questa guida si apre per un'anafilassi o
+un'emorragia, non per un reato.
+
+Il numero viene inserito all'apertura della finestra e non al caricamento della pagina,
+così un telefono che atterra in un altro paese mostra il nuovo numero senza ricaricare.
+
 ## Prove e fonti
 
 Le regole che governano il contenuto sono più severe di quelle che governano il codice.

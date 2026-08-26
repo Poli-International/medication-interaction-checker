@@ -151,6 +151,25 @@ Eine Falle, die erhalten bleiben sollte: Die thailändische Studio-Suche lautet 
 
 `geo-search.js` bringt eine Offline-Selbstprüfung mit. `node js/geo-search.js` prüft, dass jede Sprache alle vier Begriffe hat, jede zugeordnete Zone auf eine bekannte Sprache zeigt und unbekannte Sprachen korrekt auf Englisch zurückfallen.
 
+### Die örtliche Notrufnummer
+
+`geoEmergencyNumber()` wandelt dieselbe Zeitzone in eine örtliche Notrufnummer um:
+172 Zonen verweisen auf 19 Nummern, und jede nicht zugeordnete Zone fällt auf
+`112 / 911` zurück.
+
+**Diese Tabelle hat das umgekehrte Risikoprofil der Maps-Begriffe oben und ist
+entsprechend gebaut.** Eine falsche Maps-Anfrage liefert nichts; eine falsche Notrufnummer
+kostet Zeit in der einen Lage, in der Zeit das ganze Problem ist. Deshalb sind nur gut
+etablierte Nummern aufgeführt, nichts ist geraten, und die Oberfläche schreibt neben den
+erkannten Wert immer »prüfen Sie die richtige Nummer für Ihr Land und hängen Sie sie im
+Studio an die Wand«. Wo ein Land eine eigene Rettungsleitung getrennt von der Polizei
+betreibt (Norwegen 113, Schweiz 144, Brasilien 192, Russland 103), steht die
+**medizinische** Nummer: Dieser Leitfaden wird bei Anaphylaxie und Blutung geöffnet,
+nicht bei einer Straftat.
+
+Die Nummer wird beim Öffnen des Fensters gesetzt, nicht beim Laden der Seite, damit ein
+Telefon, das in einem anderen Land landet, die neue Nummer ohne Neuladen zeigt.
+
 ## Belege und Quellen
 
 Die Regeln für den Inhalt sind strenger als die für den Code.
