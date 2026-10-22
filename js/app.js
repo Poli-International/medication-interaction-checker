@@ -597,6 +597,9 @@ let currentLang = 'en';
 
 const TRANSLATIONS = {
   en: {
+    "a11y.select_language": "Select language",
+    "a11y.draft_a_message_to_your_doctor": "Draft a message to your doctor",
+    "a11y.studio_first_aid_and_emergency_protocols": "Studio first aid and emergency protocols",
     "x.br_stamp": "Poli International - Client Medication & Safety Brief",
     "x.br_date": "Date Generated:",
     "x.br_total": "Total Disclosed Medications:",
@@ -941,6 +944,9 @@ const TRANSLATIONS = {
     "x.alert_no_medications_selected": "No medications selected. Please select your medications in the Interaction Checker first."
   },
   fr: {
+    "a11y.select_language": "Choisir la langue",
+    "a11y.draft_a_message_to_your_doctor": "Rédiger un message pour votre médecin",
+    "a11y.studio_first_aid_and_emergency_protocols": "Premiers secours et protocoles d'urgence au studio",
     "x.br_stamp": "Poli International - Fiche médicaments et sécurité du client",
     "x.br_date": "Date de création :",
     "x.br_total": "Médicaments déclarés :",
@@ -1285,6 +1291,9 @@ const TRANSLATIONS = {
     "x.alert_no_medications_selected": "Aucun médicament sélectionné. Veuillez d'abord sélectionner vos médicaments dans le vérificateur d'interactions."
   },
   it: {
+    "a11y.select_language": "Scegli la lingua",
+    "a11y.draft_a_message_to_your_doctor": "Scrivi un messaggio per il tuo medico",
+    "a11y.studio_first_aid_and_emergency_protocols": "Primo soccorso e protocolli di emergenza in studio",
     "x.br_stamp": "Poli International - Scheda farmaci e sicurezza del cliente",
     "x.br_date": "Data di creazione:",
     "x.br_total": "Farmaci dichiarati:",
@@ -1629,6 +1638,9 @@ const TRANSLATIONS = {
     "x.alert_no_medications_selected": "Nessun farmaco selezionato. Seleziona prima i tuoi farmaci nel verificatore di interazioni."
   },
   es: {
+    "a11y.select_language": "Elegir idioma",
+    "a11y.draft_a_message_to_your_doctor": "Redactar un mensaje para su médico",
+    "a11y.studio_first_aid_and_emergency_protocols": "Primeros auxilios y protocolos de emergencia en el estudio",
     "x.br_stamp": "Poli International - Ficha de medicamentos y seguridad del cliente",
     "x.br_date": "Fecha de creación:",
     "x.br_total": "Medicamentos declarados:",
@@ -1973,6 +1985,9 @@ const TRANSLATIONS = {
     "x.alert_no_medications_selected": "No hay medicamentos seleccionados. Primero selecciona tus medicamentos en el verificador de interacciones."
   },
   de: {
+    "a11y.select_language": "Sprache wählen",
+    "a11y.draft_a_message_to_your_doctor": "Nachricht an Ihren Arzt entwerfen",
+    "a11y.studio_first_aid_and_emergency_protocols": "Erste Hilfe und Notfallabläufe im Studio",
     "x.br_stamp": "Poli International - Medikamenten- und Sicherheitsbogen des Kunden",
     "x.br_date": "Erstellt am:",
     "x.br_total": "Angegebene Medikamente:",
@@ -2317,6 +2332,9 @@ const TRANSLATIONS = {
     "x.alert_no_medications_selected": "Keine Medikamente ausgewählt. Bitte wählen Sie zuerst Ihre Medikamente im Wechselwirkungs-Check aus."
   },
   nl: {
+    "a11y.select_language": "Taal kiezen",
+    "a11y.draft_a_message_to_your_doctor": "Een bericht aan uw arts opstellen",
+    "a11y.studio_first_aid_and_emergency_protocols": "Eerste hulp en noodprocedures in de studio",
     "x.br_stamp": "Poli International - Medicatie- en veiligheidsoverzicht van de klant",
     "x.br_date": "Aangemaakt op:",
     "x.br_total": "Opgegeven medicijnen:",
@@ -2661,6 +2679,9 @@ const TRANSLATIONS = {
     "x.alert_no_medications_selected": "Geen medicijnen geselecteerd. Selecteer eerst je medicijnen in de interactiechecker."
   },
   pt: {
+    "a11y.select_language": "Escolher idioma",
+    "a11y.draft_a_message_to_your_doctor": "Redigir uma mensagem para o seu médico",
+    "a11y.studio_first_aid_and_emergency_protocols": "Primeiros socorros e protocolos de emergência no estúdio",
     "x.br_stamp": "Poli International - Ficha de medicamentos e segurança do cliente",
     "x.br_date": "Data de criação:",
     "x.br_total": "Medicamentos declarados:",
@@ -3005,6 +3026,9 @@ const TRANSLATIONS = {
     "x.alert_no_medications_selected": "Nenhum medicamento selecionado. Selecione primeiro os seus medicamentos no verificador de interações."
   },
   th: {
+    "a11y.select_language": "เลือกภาษา",
+    "a11y.draft_a_message_to_your_doctor": "ร่างข้อความถึงแพทย์ของคุณ",
+    "a11y.studio_first_aid_and_emergency_protocols": "การปฐมพยาบาลและขั้นตอนฉุกเฉินในร้าน",
     "x.br_stamp": "Poli International - เอกสารยาและความปลอดภัยของลูกค้า",
     "x.br_date": "วันที่สร้าง:",
     "x.br_total": "จำนวนยาที่แจ้ง:",
@@ -3453,6 +3477,10 @@ function updateUILanguage(lang) {
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
     if (dict[key]) el.placeholder = dict[key];
+  });
+  document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+    const key = el.getAttribute('data-i18n-aria-label');
+    if (dict[key]) el.setAttribute('aria-label', dict[key]);
   });
 
   // English readers are reading the source, so the notice would be noise.
